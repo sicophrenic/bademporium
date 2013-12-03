@@ -1,0 +1,4 @@
+- flash.each do |type, message|
+  - if type != 'timedout'
+    %div.data{ :class => "flash alert "+flash_msg(type) }
+      = message

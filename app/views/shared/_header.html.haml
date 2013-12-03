@@ -1,0 +1,11 @@
+= link_to root_path do
+  BaD Emporium
+
+|
+
+- if user_signed_in?
+  = link_to destroy_user_session_path do
+    Sign Out
+- else
+  = link_to new_user_session_path do
+    Sign In
