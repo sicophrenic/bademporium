@@ -57,4 +57,11 @@ Bademporium::Application.routes.draw do
   #     # (app/controllers/admin/products_controller.rb)
   #     resources :products
   #   end
+  namespace :blackjack do
+    get 'new', :action => 'new_game'
+    post 'create', :action => 'create_game'
+    get 'join/:id', :action => 'join_game', :as => 'join'
+    get 'find', :action => 'find_game'
+    get 'destroy/:id', :action => 'destroy_game', :as => 'destroy'
+  end
 end

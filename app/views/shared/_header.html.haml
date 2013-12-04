@@ -6,6 +6,10 @@
 - if user_signed_in?
   = link_to destroy_user_session_path do
     Sign Out
+  = link_to blackjack_new_path do
+    Create a Blackjack game
+  = link_to blackjack_find_path do
+    Find a Blackjack game
 - else
   = link_to new_user_session_path do
     Sign In

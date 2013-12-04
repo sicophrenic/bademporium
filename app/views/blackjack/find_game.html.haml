@@ -1,0 +1,35 @@
+%h1 Blackjack#find_game
+
+- if @games.count > 0
+  %table
+    %thead
+      %tr
+        %th
+          Game Number
+        %th
+          Number of decks
+        %th
+          Number of players
+        %th
+          Room created
+        %th
+    %tbody
+      - @games.each do |game|
+        %tr
+          %td
+            = link_to blackjack_join_path(game.id) do
+              Game ##{game.id}
+          %td
+            #{game.num_decks}
+          %td
+            ? / #{game.num_players}
+          %td
+            #{game.created_at.to_date}
+          %td
+            = link_to blackjack_destroy_path(game.id) do
+              Close
+- else
+  No games are available! Why not create one
+  = link_to blackjack_new_path do
+    here
+  ?

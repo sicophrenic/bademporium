@@ -1,0 +1,8 @@
+%h1 Blackjack#new_game
+
+= form_tag blackjack_create_path, :method => :post do
+  = label_tag 'num_decks', 'Number of decks'
+  = number_field_tag 'blackjack_options[num_decks]', 6, :in => 1...7
+  = label_tag 'num_players', 'Number of players'
+  = number_field_tag 'blackjack_options[num_players]', 1, :in => 1...7
+  = submit_tag 'Go'
