@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(version: 20131205230904) do
   create_table "players", force: true do |t|
     t.integer  "user_id",                    null: false
     t.integer  "game_id",                    null: false
+    t.integer  "hand_id",    default: 0,     null: false
     t.boolean  "deal_in",    default: false
     t.datetime "created_at"
     t.datetime "updated_at"

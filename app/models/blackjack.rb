@@ -2,23 +2,24 @@
 class Blackjack < Game
   after_create :reset
 
-  def deal_cards
-    if should_deal?
-      get_new_hands
-      2.times do
-        players.each do |player|
-          next unless player.deal_in?
-          if player.hands.empty?
-            player.get_new_hand
-          end
-          drawn = draw
-          player.hands.first.cards += drawn
-        end
-        dealer_hand.cards += draw
-      end
-      players.map(&:save!)
-      save!
+  # Game methods
+  def next_player
+    self.current_player += 1
+    self.save!
+  end
+
+  def draw(n = 1)
+    popped = []
+    n.times do
+      popped << cards.pop
     end
+    return popped
+  end
+
+  # Pre-game methods
+  def prep_game
+    get_new_hands
+    deal_cards(false)
   end
 
   def reset
@@ -26,6 +27,26 @@ class Blackjack < Game
     shuffle
     update_attribute(:current_player, 0)
     # get_new_hands
+  end
+
+  def deal_cards(new_hands = true)
+    puts 'deal_cards' if Rails.env.development?
+    if should_deal?
+      get_new_hands if new_hands # TODO - not sure if we need this here
+      2.times do
+        players.each do |player|
+          next unless player.deal_in?
+          if player.hands.empty?
+            player.get_new_hand
+          end
+          hand = player.hands.first
+          hand.cards += draw
+          hand.save!
+        end
+        dealer_hand.cards += draw
+        dealer_hand.save!
+      end
+    end
   end
 
   def shuffle
@@ -40,16 +61,9 @@ class Blackjack < Game
     self.save!
   end
 
+  # Helper methods
   def all_cards
     cards.map(&:to_s)
-  end
-
-  def draw(n = 1)
-    popped = []
-    n.times do
-      popped << cards.pop
-    end
-    return popped
   end
 
   def cards_left

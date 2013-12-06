@@ -35,12 +35,16 @@ class Hand < ActiveRecord::Base
     points
   end
 
-  def finish
+  def mark_as_played
     update_attribute(:played, true)
   end
 
   def to_s
-    "#{cards.map(&:to_s).join(', ')} == #{value(false)}"
+    if cards.empty?
+      '[] == 0'
+    else
+      "#{cards.map(&:to_s).join(', ')} == #{value(false)}"
+    end
   end
 
   private

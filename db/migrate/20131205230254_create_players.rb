@@ -4,6 +4,7 @@ class CreatePlayers < ActiveRecord::Migration
     create_table :players do |t|
       t.integer :user_id, :null => false
       t.integer :game_id, :null => false
+      t.integer :hand_id, :default => 0, :null => false
       t.boolean :deal_in, :default => false
 
       t.timestamps

@@ -19,13 +19,16 @@ class Game < ActiveRecord::Base
   end
 
   def get_new_hands
+    puts 'get_new_hands' if Rails.env.development?
     new_dealer_hand
     players.each do |player|
+      player.hands.map(&:mark_as_played)
       player.get_new_hand
     end
   end
 
   def new_dealer_hand
+    self.dealer_hand.mark_as_played
     self.dealer_hand = Hand.create!(:dealer_id => self.id)
     save!
   end

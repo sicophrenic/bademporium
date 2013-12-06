@@ -6,18 +6,30 @@ class ApiController < ApplicationController
   before_action :configure_blackjack_params, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
   before_action :set_blackjack_game, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
   before_action :set_blackjack_user, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
-  before_action :verify_user_turn, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
+  before_action :set_player_hand, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
+  before_action :verify_action, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
 
+  # Blackjack actions
   def blackjack_hit
+    @card = @blackjack.draw
+    @hand.cards << @card
   end
 
   def blackjack_stand
+    if @player.end_turn?
+      @blackjack.next_player
+    else
+      @player.next_hand
+    end
   end
 
   def blackjack_double
+    @card = @blackjack.draw
+    @hand.cards << @card
   end
 
   def blackjack_split
+    @player.split_hand(@hand.id)
   end
 
   private
@@ -28,16 +40,19 @@ class ApiController < ApplicationController
     def set_blackjack_user
       @player = Player.find(params[:player_id])
     end
+    def set_player_hand
+      @hand = Hand.find(params[:hand_id])
+    end
 
-    def verify_user_turn
-      if @blackjack.players[@blackjack.current_player].id != @player.id
+    def verify_action
+      if @blackjack.players[@blackjack.current_player].id != @player.id || !@hand.id.in?(@player.hands.map(&:id))
         flash[:error] = 'Fuck you, cheater! (Actually, if this is a bug, please report it. Sorry for the vulgarity.)'
         redirect_to blackjack_join_path(@blackjack.id)
       end
     end
 
     def configure_blackjack_params
-      configure_params([:blackjack_game_id, :player_id]) do
+      configure_params([:blackjack_game_id, :player_id, :hand_id]) do
         flash[:error] = "Invalid params; #{@missing_params} were not present in the request."
         redirect_to blackjack_join_path(@blackjack.id)
       end
