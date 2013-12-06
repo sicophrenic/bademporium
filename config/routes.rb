@@ -64,4 +64,11 @@ Bademporium::Application.routes.draw do
     get 'find', :action => 'find_game'
     get 'destroy/:id', :action => 'destroy_game', :as => 'destroy'
   end
+
+  scope :api, :controller => 'api' do
+    post 'blackjack_hit'
+    post 'blackjack_stand'
+    post 'blackjack_double'
+    post 'blackjack_split'
+  end
 end

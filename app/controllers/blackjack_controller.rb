@@ -15,8 +15,13 @@ class BlackjackController < ApplicationController
   end
 
   def join_game
-    flash[:error] = "Thanks for trying to play a game, but it's not implemented yet."
-    redirect_to root_path
+    if can_join_game?(@blackjack)
+      flash[:error] = "Thanks for trying to play a game, but it's not implemented yet."
+      redirect_to root_path
+    else
+      flash[:error] = 'Sorry, that game is full.'
+      redirect_to blackjack_find_path
+    end
   end
 
   def destroy_game

@@ -10,4 +10,33 @@ class ApplicationController < ActionController::Base
       redirect_to root_path
     end
   end
+
+  def can_join_game?(game)
+    return game.players.count < game.num_players
+  end
+
+  def configure_params(required, optional = {})
+    @missing_params = []
+    required.each do |param|
+      if !param.in?(params.keys)
+        @missing_params << required
+      end
+    end
+    if !@missing_params.empty?
+      yield
+    else
+      optional.each do |to_do, param_keys|
+        case to_do
+        when 'boolify'
+          param_keys.each do |key|
+            if params[key].in?(1, true, '1', 'true')
+              params[key] = true
+            elsif params[key].in?(0, false, '0', 'false')
+              params[key] = false
+            end
+          end
+        end
+      end
+    end
+  end
 end

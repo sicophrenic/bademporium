@@ -7,4 +7,6 @@ class User < ActiveRecord::Base
          :confirmable
 
   attr_accessible :email, :password, :password_confirmation, :admin
+
+  has_many :players
 end

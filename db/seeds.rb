@@ -8,6 +8,6 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 Card::SUITS.keys.each do |suit|
   Card::VALUES.each do |value|
-    Card.create(:number => value, :suit => suit)
+    Card.create(:value => value, :suit => suit)
   end
 end

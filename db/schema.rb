@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131204001043) do
+ActiveRecord::Schema.define(version: 20131205230904) do
 
   create_table "blackjacks", force: true do |t|
     t.datetime "created_at"
@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 20131204001043) do
   end
 
   create_table "cards", force: true do |t|
-    t.string   "number"
-    t.string   "suit"
+    t.string   "value",      null: false
+    t.string   "suit",       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -31,6 +31,23 @@ ActiveRecord::Schema.define(version: 20131204001043) do
     t.integer  "current_player", default: 0
     t.integer  "num_decks"
     t.string   "cards",          default: "--- []\n"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "hands", force: true do |t|
+    t.integer  "player_id"
+    t.integer  "dealer_id"
+    t.string   "cards",      default: "--- []\n"
+    t.boolean  "played",     default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "players", force: true do |t|
+    t.integer  "user_id",                    null: false
+    t.integer  "game_id",                    null: false
+    t.boolean  "deal_in",    default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
