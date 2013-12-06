@@ -35,6 +35,10 @@ class Hand < ActiveRecord::Base
     points
   end
 
+  def can_split?
+    cards.count == 2 && cards.map(&:to_int_value).count(cards.first.to_int_value) == 2
+  end
+
   def mark_as_played
     update_attribute(:played, true)
   end
@@ -45,6 +49,10 @@ class Hand < ActiveRecord::Base
     else
       "#{cards.map(&:to_s).join(', ')} == #{value(false)}"
     end
+  end
+
+  def empty?
+    cards.empty?
   end
 
   private

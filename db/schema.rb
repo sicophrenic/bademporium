@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 20131205230904) do
 
   create_table "games", force: true do |t|
     t.string   "type"
-    t.integer  "num_players"
+    t.integer  "num_players",                         null: false
     t.integer  "current_player", default: 0
     t.integer  "num_decks"
     t.string   "cards",          default: "--- []\n"
@@ -45,10 +45,10 @@ ActiveRecord::Schema.define(version: 20131205230904) do
   end
 
   create_table "players", force: true do |t|
-    t.integer  "user_id",                    null: false
-    t.integer  "game_id",                    null: false
-    t.integer  "hand_id",    default: 0,     null: false
-    t.boolean  "deal_in",    default: false
+    t.integer  "user_id",                      null: false
+    t.integer  "game_id",                      null: false
+    t.integer  "current_hand", default: 0,     null: false
+    t.boolean  "deal_in",      default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

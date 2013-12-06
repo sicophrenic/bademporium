@@ -9,11 +9,18 @@ class Blackjack < Game
   end
 
   def draw(n = 1)
-    popped = []
-    n.times do
-      popped << cards.pop
+    if n == 1
+      card = cards.pop
+      save!
+      return card
+    else
+      popped = []
+      n.times do
+        popped << cards.pop
+      end
+      save!
+      return popped
     end
-    return popped
   end
 
   # Pre-game methods
@@ -40,10 +47,10 @@ class Blackjack < Game
             player.get_new_hand
           end
           hand = player.hands.first
-          hand.cards += draw
+          hand.cards << draw
           hand.save!
         end
-        dealer_hand.cards += draw
+        dealer_hand.cards << draw
         dealer_hand.save!
       end
     end
@@ -79,6 +86,18 @@ class Blackjack < Game
       p.hands.each_with_index do |h, h_i|
         puts "\t\t\tHand ##{h_i+1}: #{h.to_s}"
       end
+    end
+  end
+
+  def current_player_obj
+    players[current_player]
+  end
+
+  def current_player_id
+    if current_player == players.count
+      return -1
+    else
+      return current_player_obj.id
     end
   end
 

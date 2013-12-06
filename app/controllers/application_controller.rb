@@ -18,8 +18,8 @@ class ApplicationController < ActionController::Base
   def configure_params(required, optional = {})
     @missing_params = []
     required.each do |param|
-      if !param.in?(params.keys)
-        @missing_params << required
+      if !param.to_s.in?(params.keys)
+        @missing_params << param
       end
     end
     if !@missing_params.empty?

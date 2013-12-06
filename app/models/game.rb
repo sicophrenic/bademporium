@@ -28,8 +28,8 @@ class Game < ActiveRecord::Base
   end
 
   def new_dealer_hand
-    self.dealer_hand.mark_as_played
-    self.dealer_hand = Hand.create!(:dealer_id => self.id)
+    dealer_hand.mark_as_played if dealer_hand
+    self.dealer_hand = Hand.create!(:dealer_id => id)
     save!
   end
 

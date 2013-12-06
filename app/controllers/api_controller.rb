@@ -11,25 +11,37 @@ class ApiController < ApplicationController
 
   # Blackjack actions
   def blackjack_hit
+    @action = 'hit'
     @card = @blackjack.draw
     @hand.cards << @card
+    @hand.save
+    render 'blackjack/game'
   end
 
   def blackjack_stand
+    @action = 'stand'
     if @player.end_turn?
       @blackjack.next_player
     else
       @player.next_hand
     end
+    render 'blackjack/game'
   end
 
   def blackjack_double
+    @action = 'double'
     @card = @blackjack.draw
     @hand.cards << @card
+    @hand.save
+    render 'blackjack/game'
   end
 
   def blackjack_split
-    @player.split_hand(@hand.id)
+    @action = 'split'
+    if @hand.can_split?
+      @player.split_hand
+    end
+    render 'blackjack/game'
   end
 
   private
@@ -45,7 +57,7 @@ class ApiController < ApplicationController
     end
 
     def verify_action
-      if @blackjack.players[@blackjack.current_player].id != @player.id || !@hand.id.in?(@player.hands.map(&:id))
+      if @blackjack.current_player_id != @player.id || !@hand.id.in?(@player.hands.map(&:id))
         flash[:error] = 'Fuck you, cheater! (Actually, if this is a bug, please report it. Sorry for the vulgarity.)'
         redirect_to blackjack_join_path(@blackjack.id)
       end
@@ -54,7 +66,7 @@ class ApiController < ApplicationController
     def configure_blackjack_params
       configure_params([:blackjack_game_id, :player_id, :hand_id]) do
         flash[:error] = "Invalid params; #{@missing_params} were not present in the request."
-        redirect_to blackjack_join_path(@blackjack.id)
+        redirect_to blackjack_find_path
       end
     end
 end

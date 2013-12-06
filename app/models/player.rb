@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-#
 class Player < ActiveRecord::Base
-  attr_accessible :user_id, :game_id, :hand_id
+  attr_accessible :user_id, :game_id, :current_hand
 
   has_many :hands
 
@@ -9,16 +9,32 @@ class Player < ActiveRecord::Base
 
   # Game methods
   def end_turn?
-    hand_id == hands.count - 1
+    current_hand == hands.count - 1
   end
 
-  def current_hand
-    hands[hand_id]
+  def my_turn?
+    game.current_player_id == id
+  end
+
+  def current_hand_id
+    if current_hand == hands.count
+      return -1
+    else
+      return current_hand_obj.id
+    end
+  end
+
+  def current_hand_obj
+    hands[current_hand]
   end
 
   def next_hand
-    self.hand_id += 1
+    self.current_hand += 1
     self.save!
+  end
+
+  def split_hand
+    # hand = hands.delete() # TODO
   end
 
   # Pre-game methods

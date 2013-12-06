@@ -1,0 +1,74 @@
+%h1 Blackjack#game
+
+- if @blackjack.players.map(&:deal_in).count(true) == 0
+  - # no valid players
+  - # not dealed in yet
+  = form_tag blackjack_ready_up_path(@blackjack.id, @player.id) do
+    = submit_tag 'Deal Me In'
+- else
+  - # (some) players are ready to play
+
+  - if @blackjack.dealer_hand.nil?
+    - # game not yet started
+    = form_tag blackjack_game_start_path(@blackjack.id) do
+      = submit_tag 'Start game'
+  - else
+
+    - # show dealer hand
+    - if @blackjack.dealer_hand && !@blackjack.dealer_hand.empty? # if there is a dealer hand
+      Dealer hand:
+      %br
+      %b
+        #{@blackjack.dealer_hand.to_s}
+
+    %br
+    %br
+
+    - # show player's last action if it exists:
+    - case @action
+    - when 'hit'
+      Your action: Hit
+      %br
+      Your card: #{@card.to_s}
+    - when 'stand'
+      Your action: Stand
+    - when 'double'
+      Your action: Double
+      %br
+      Your card: #{@card.to_s}
+    - when 'split'
+      Your action: Split
+
+    %br
+    %br
+
+    - # show player hand(s)
+    - @player.hands.each_with_index do |hand, idx|
+      - hand.reload
+      - next if hand.cards.empty?
+      Player hand #{idx+1}:
+      %br
+      %b{ :class => "#{@blackjack.current_player_id == @player.id && @player.current_hand_id == idx ? 'your-move' : ''}" }
+        #{hand.to_s}
+
+      / %br
+      / %p.border-me
+      /   \--debug
+      /   #{@hand.cards.map(&:to_s)}
+      /   debug--
+      / %br
+
+
+    - if @player.my_turn?
+      / Stand
+      = form_tag blackjack_stand_path(@blackjack.id, @player.id, @player.current_hand_id) do
+        = submit_tag 'Stand'
+      / Hit
+      = form_tag blackjack_hit_path(@blackjack.id, @player.id, @player.current_hand_id) do
+        = submit_tag 'Hit'
+      / Double
+      = form_tag blackjack_double_path(@blackjack.id, @player.id, @player.current_hand_id) do
+        = submit_tag 'Double'
+      / Split
+      = form_tag blackjack_split_path(@blackjack.id, @player.id, @player.current_hand_id) do
+        = submit_tag 'Split'

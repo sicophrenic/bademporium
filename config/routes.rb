@@ -63,12 +63,14 @@ Bademporium::Application.routes.draw do
     get 'join/:id', :action => 'join_game', :as => 'join'
     get 'find', :action => 'find_game'
     get 'destroy/:id', :action => 'destroy_game', :as => 'destroy'
+    post 'deal_me_in/:id/player/:player_id', :action => 'ready_up', :as => 'ready_up'
+    post 'game_start/:id', :action => 'game_start', :as => 'game_start'
   end
 
   scope :api, :controller => 'api' do
-    post 'blackjack_hit'
-    post 'blackjack_stand'
-    post 'blackjack_double'
-    post 'blackjack_split'
+    post 'blackjack_hit/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_hit', :as => 'blackjack_hit'
+    post 'blackjack_stand/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_stand', :as => 'blackjack_stand'
+    post 'blackjack_double/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_double', :as => 'blackjack_double'
+    post 'blackjack_split/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_split', :as => 'blackjack_split'
   end
 end

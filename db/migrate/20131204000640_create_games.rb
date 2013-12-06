@@ -3,7 +3,7 @@ class CreateGames < ActiveRecord::Migration
   def change
     create_table :games do |t|
       t.string :type
-      t.integer :num_players
+      t.integer :num_players, :null => false
       t.integer :current_player, :default => 0
       t.integer :num_decks
       t.string :cards, :default => []
