@@ -21,6 +21,7 @@ class ApiController < ApplicationController
   def blackjack_stand
     @action = 'stand'
     if @player.end_turn?
+      @player.hands.map(&:mark_as_played)
       @blackjack.next_player
     else
       @player.next_hand

@@ -16,10 +16,11 @@
 
     - # show dealer hand
     - if @blackjack.dealer_hand && !@blackjack.dealer_hand.empty? # if there is a dealer hand
-      Dealer hand:
-      %br
-      %b
-        #{@blackjack.dealer_hand.to_s}
+      .border-me
+        Dealer hand:
+        %br
+        %div
+          #{@blackjack.dealer_hand.to_s}
 
     %br
     %br
@@ -46,10 +47,11 @@
     - @player.hands.each_with_index do |hand, idx|
       - hand.reload
       - next if hand.cards.empty?
-      Player hand #{idx+1}:
-      %br
-      %b{ :class => "#{@blackjack.current_player_id == @player.id && @player.current_hand_id == idx ? 'your-move' : ''}" }
-        #{hand.to_s}
+      .border-me
+        Player hand #{idx+1}:
+        %br
+        %div{ :class => "#{@blackjack.current_player_id == @player.id && @player.current_hand_id == idx ? 'your-move' : ''}" }
+          #{hand.to_s}
 
       / %br
       / %p.border-me
@@ -59,7 +61,7 @@
       / %br
 
 
-    - if @player.my_turn?
+    - if @player.my_turn? && !@blackjack.game_played?
       / Stand
       = form_tag blackjack_stand_path(@blackjack.id, @player.id, @player.current_hand_id) do
         = submit_tag 'Stand'
@@ -72,3 +74,18 @@
       / Split
       = form_tag blackjack_split_path(@blackjack.id, @player.id, @player.current_hand_id) do
         = submit_tag 'Split'
+
+    - if @blackjack.game_played?
+      = form_tag blackjack_redeal_path(@blackjack.id) do
+        = submit_tag 'Deal'
+
+- if Rails.env.development?
+  %br
+  %br
+  .border-me
+    Debug info:
+    %ul
+      %li
+        @player.my_turn?: #{@player.my_turn?}
+      %li
+        @blackjack.game_played?: #{@blackjack.game_played?}

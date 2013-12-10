@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-#
 class Hand < ActiveRecord::Base
-  attr_accessible :player_id, :dealer_id
+  attr_accessible :player_id, :dealer_id, :played
 
   belongs_to :player
   belongs_to :game, :foreign_key => 'dealer_id'
@@ -9,6 +9,10 @@ class Hand < ActiveRecord::Base
 
   validate :exclusive_hand
 
+  # Method: calculate the value of a hand
+  # Parameters:
+  #   debug - when set to true, print out hand value along with which cards are in hand
+  #         - set to false when printing out hand (to_s) because we don't want all that extra logging to show up
   def value(debug = true)
     points = 0
     seen_ace = false
@@ -26,13 +30,24 @@ class Hand < ActiveRecord::Base
         points += card.value.to_i
       end
       if seen_ace && points > 21
+        seen_ace = false
         points -= 10
       end
     end
     if Rails.env.development? && debug
       puts "[debug-hand.value] -- #{cards.map(&:value)} = #{points}"
     end
-    points
+    return points, seen_ace
+  end
+
+  def soft?
+    total_value, ace_counter = value
+    return ace_counter
+  end
+
+  def bust?
+    total_value, ace_counter = value
+    return total_value > 21
   end
 
   def can_split?
@@ -47,7 +62,8 @@ class Hand < ActiveRecord::Base
     if cards.empty?
       '[] == 0'
     else
-      "#{cards.map(&:to_s).join(', ')} == #{value(false)}"
+      total, soft = value(false)
+      "#{cards.map(&:to_s).join(', ')} == #{total}, soft? #{soft}"
     end
   end
 

@@ -3,9 +3,46 @@ class Blackjack < Game
   after_create :reset
 
   # Game methods
+  def dealer_move
+    if need_to_play?
+      value, hard = dealer_hand.value
+      while value <= 17
+        if (value == 17 && dealer_hand.soft?) || (value < 17)
+          dealer_hand.cards << draw
+        end
+        value, hard = dealer_hand.value
+      end
+      dealer_hand.save!
+    end
+  end
+
+  def need_to_play?
+    player_hands = []
+    players.each do |p|
+      p.hands.each do |h|
+        player_hands << h.bust?
+      end
+    end
+    !player_hands.all?
+  end
+
   def next_player
     self.current_player += 1
     self.save!
+    if self.current_player == players.count
+      dealer_move
+    end
+    dealer_hand.mark_as_played
+  end
+
+  def game_played?
+    game_hands = dealer_hand ? [dealer_hand.played] : [nil]
+    players.each do |p|
+      p.hands.each do |h|
+        game_hands << h.played unless h.nil?
+      end
+    end
+    game_hands.all?
   end
 
   def draw(n = 1)

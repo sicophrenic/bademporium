@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-#
 class BlackjackController < ApplicationController
   before_action :require_signed_in
-  before_action :set_blackjack, :only => [:join_game, :destroy_game, :ready_up, :game_start]
+  before_action :set_blackjack, :only => [:join_game, :destroy_game, :ready_up, :game_start, :redeal]
 
   def find_game
     @games = Blackjack.all # .where(:privacy => 'public')
@@ -39,6 +39,13 @@ class BlackjackController < ApplicationController
   end
 
   def game_start
+    @blackjack.prep_game
+    @player = @blackjack.current_player_obj
+    render 'game'
+  end
+
+  def redeal
+    @blackjack.reset
     @blackjack.prep_game
     @player = @blackjack.current_player_obj
     render 'game'

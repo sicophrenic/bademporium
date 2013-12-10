@@ -65,6 +65,7 @@ Bademporium::Application.routes.draw do
     get 'destroy/:id', :action => 'destroy_game', :as => 'destroy'
     post 'deal_me_in/:id/player/:player_id', :action => 'ready_up', :as => 'ready_up'
     post 'game_start/:id', :action => 'game_start', :as => 'game_start'
+    post 'redeal/:id', :action => 'redeal', :as => 'redeal'
   end
 
   scope :api, :controller => 'api' do
