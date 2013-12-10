@@ -5,12 +5,11 @@ class Blackjack < Game
   # Game methods
   def dealer_move
     if need_to_play?
-      value, hard = dealer_hand.value
-      while value <= 17
-        if (value == 17 && dealer_hand.soft?) || (value < 17)
-          dealer_hand.cards << draw
-        end
-        value, hard = dealer_hand.value
+      value, hard = dealer_hand.value({:points_and_soft => true})
+      while (value == 17 && dealer_hand.soft?) || value < 17
+        # dealer_hand is less than 17 or is a soft 17
+        dealer_hand.cards << draw
+        value, hard = dealer_hand.value({:points_and_soft => true})
       end
       dealer_hand.save!
     end

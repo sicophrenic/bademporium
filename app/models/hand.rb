@@ -11,9 +11,10 @@ class Hand < ActiveRecord::Base
 
   # Method: calculate the value of a hand
   # Parameters:
+  #   points_only
   #   debug - when set to true, print out hand value along with which cards are in hand
   #         - set to false when printing out hand (to_s) because we don't want all that extra logging to show up
-  def value(debug = true)
+  def value(opts = {:points_only => true})
     points = 0
     seen_ace = false
     cards.each do |card|
@@ -34,20 +35,43 @@ class Hand < ActiveRecord::Base
         points -= 10
       end
     end
-    if Rails.env.development? && debug
+    if Rails.env.development? && opts[:debug]
       puts "[debug-hand.value] -- #{cards.map(&:value)} = #{points}"
     end
-    return points, seen_ace
+    if opts[:points_only]
+      return points
+    elsif opts[:soft_only]
+      return seen_ace
+    elsif opts[:points_and_soft]
+      return points, seen_ace
+    end
   end
 
   def soft?
-    total_value, ace_counter = value
-    return ace_counter
+    value({:soft_only => true})
   end
 
   def bust?
-    total_value, ace_counter = value
-    return total_value > 21
+    value > 21
+  end
+
+  def win_lose_push(target)
+    if value > 21
+      # player bust
+      'lose'
+    elsif target > 21
+      # dealer bust
+      'win'
+    elsif value < target
+      # player less than dealer
+      'lose'
+    elsif value == target
+      # player equal dealer
+      'push'
+    elsif value > target
+      # player beat dealer
+      'win'
+    end
   end
 
   def can_split?
@@ -62,8 +86,7 @@ class Hand < ActiveRecord::Base
     if cards.empty?
       '[] == 0'
     else
-      total, soft = value(false)
-      "#{cards.map(&:to_s).join(', ')} == #{total}, soft? #{soft}"
+      "#{cards.map(&:to_s).join(', ')} == #{value(:points_only => true)}"
     end
   end
 
