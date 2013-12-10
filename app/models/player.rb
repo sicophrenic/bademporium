@@ -35,6 +35,7 @@ class Player < ActiveRecord::Base
 
   def split_hand
     # hand = hands.delete() # TODO
+    # check_for_blackjack
   end
 
   # Pre-game methods

@@ -15,13 +15,26 @@ class ApiController < ApplicationController
     @card = @blackjack.draw
     @hand.cards << @card
     @hand.save
+
+    # if player has busted, end hand
+    if @hand.bust? || @hand.value == 21
+      @hand.mark_as_played
+      # move on to next hand or next player
+      if @player.end_turn?
+        @blackjack.next_player
+      else
+        @player.next_hand
+      end
+    end
     render 'blackjack/game'
   end
 
   def blackjack_stand
     @action = 'stand'
+    @hand.mark_as_played
+
+    # move on to next hand or next player
     if @player.end_turn?
-      @player.hands.map(&:mark_as_played)
       @blackjack.next_player
     else
       @player.next_hand
@@ -34,6 +47,14 @@ class ApiController < ApplicationController
     @card = @blackjack.draw
     @hand.cards << @card
     @hand.save
+    @hand.mark_as_played
+
+    # only get one card for double
+    if @player.end_turn?
+      @blackjack.next_player
+    else
+      @player.next_hand
+    end
     render 'blackjack/game'
   end
 

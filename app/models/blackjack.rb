@@ -13,6 +13,7 @@ class Blackjack < Game
       end
       dealer_hand.save!
     end
+    dealer_hand.mark_as_played
   end
 
   def need_to_play?
@@ -30,8 +31,19 @@ class Blackjack < Game
     self.save!
     if self.current_player == players.count
       dealer_move
+    else
+      check_for_blackjack
     end
-    dealer_hand.mark_as_played
+  end
+
+  def dealer_move?
+    current_player == players.count
+  end
+
+  def check_for_blackjack
+    if current_player_obj.current_hand_obj.blackjack?
+      next_player
+    end
   end
 
   def game_played?
@@ -60,9 +72,13 @@ class Blackjack < Game
   end
 
   # Pre-game methods
-  def prep_game
+  def prep_game(save_hands = false)
+    if save_hands
+      GameHand.create_from_game(self)
+    end
     get_new_hands
     deal_cards(false)
+    check_for_blackjack
   end
 
   def reset

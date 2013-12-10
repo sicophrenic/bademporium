@@ -41,13 +41,15 @@ class BlackjackController < ApplicationController
   def game_start
     @blackjack.prep_game
     @player = @blackjack.current_player_obj
+    @hand = @player.current_hand_obj
     render 'game'
   end
 
   def redeal
-    @blackjack.reset
-    @blackjack.prep_game
+    @blackjack.reset # TODO - don't need to reset unless deck is out of cards (or close to it)
+    @blackjack.prep_game(true) # prep game and save game hands
     @player = @blackjack.current_player_obj
+    @hand = @player.current_hand_obj
     render 'game'
   end
 

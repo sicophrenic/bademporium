@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131205230904) do
+ActiveRecord::Schema.define(version: 20131210183704) do
 
   create_table "blackjacks", force: true do |t|
     t.datetime "created_at"
@@ -24,6 +24,16 @@ ActiveRecord::Schema.define(version: 20131205230904) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "game_hands", force: true do |t|
+    t.string   "game_type",      null: false
+    t.string   "hand_ids",       null: false
+    t.integer  "dealer_hand_id", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "game_hands", ["game_type"], name: "index_game_hands_on_game_type"
 
   create_table "games", force: true do |t|
     t.string   "type"

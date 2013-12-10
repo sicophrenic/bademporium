@@ -55,6 +55,10 @@ class Hand < ActiveRecord::Base
     value > 21
   end
 
+  def blackjack?
+    value == 21 && cards.count == 2
+  end
+
   def win_lose_push(target)
     if value > 21
       # player bust
@@ -74,6 +78,10 @@ class Hand < ActiveRecord::Base
     end
   end
 
+  def can_double?
+    cards.count == 2
+  end
+
   def can_split?
     cards.count == 2 && cards.map(&:to_int_value).count(cards.first.to_int_value) == 2
   end
@@ -87,6 +95,14 @@ class Hand < ActiveRecord::Base
       '[] == 0'
     else
       "#{cards.map(&:to_s).join(', ')} == #{value(:points_only => true)}"
+    end
+  end
+
+  def to_dealer_s
+    if cards.empty?
+      to_s
+    else
+      "#{cards.last.to_s}"
     end
   end
 

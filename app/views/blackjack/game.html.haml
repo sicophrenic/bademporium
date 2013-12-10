@@ -22,7 +22,10 @@
         Dealer hand:
         %br
         %div
-          #{@blackjack.dealer_hand.to_s}
+          - if @blackjack.dealer_move?
+            #{@blackjack.dealer_hand.to_s}
+          - else
+            #{@blackjack.dealer_hand.to_dealer_s}
 
     %br
     %br
@@ -52,6 +55,8 @@
       .border-me
         Player hand #{idx+1}:
         %br
+        - if @blackjack.current_player_id == @player.id && @player.current_hand_id == idx
+          >>
         %div{ :class => "#{@blackjack.current_player_id == @player.id && @player.current_hand_id == idx ? 'your-move' : ''} #{@blackjack.game_played? ? hand.win_lose_push(dealer_value) : ''}" }
           #{hand.to_s}
 
@@ -70,12 +75,14 @@
       / Hit
       = form_tag blackjack_hit_path(@blackjack.id, @player.id, @player.current_hand_id) do
         = submit_tag 'Hit'
-      / Double
-      = form_tag blackjack_double_path(@blackjack.id, @player.id, @player.current_hand_id) do
-        = submit_tag 'Double'
-      / Split
-      = form_tag blackjack_split_path(@blackjack.id, @player.id, @player.current_hand_id) do
-        = submit_tag 'Split'
+      - if @hand.can_double?
+        / Double
+        = form_tag blackjack_double_path(@blackjack.id, @player.id, @player.current_hand_id) do
+          = submit_tag 'Double'
+      - if @hand.can_split?
+        / Split
+        = form_tag blackjack_split_path(@blackjack.id, @player.id, @player.current_hand_id) do
+          = submit_tag 'Split'
 
     - if @blackjack.game_played?
       = form_tag blackjack_redeal_path(@blackjack.id) do
