@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  enabled_for_beta: false
+  enabled_for_everyone: false
+
+two:
+  name: MyString
+  enabled_for_beta: false
+  enabled_for_everyone: false

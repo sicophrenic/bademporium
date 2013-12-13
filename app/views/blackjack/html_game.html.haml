@@ -1,0 +1,100 @@
+- if !@player.deal_in
+  / not dealed in yet
+  = form_tag blackjack_ready_up_path(@blackjack.id, @player.id) do
+    = submit_tag 'Deal Me In'
+
+- else
+  - if @blackjack.dealer_hand.nil?
+    / (some) players are ready to play but game has not started yet
+    = form_tag blackjack_game_start_path(@blackjack.id) do
+      = submit_tag 'Start game'
+  - else
+    - dealer_value = @blackjack.dealer_hand.value
+
+    / show dealer hand appropriately
+    .border-me
+      Dealer hand:
+      %br
+      %div
+        - if @blackjack.dealer_move?
+          #{@blackjack.dealer_hand.to_s}
+        - else
+          #{@blackjack.dealer_hand.dealer_showing}
+
+    %br
+    %br
+
+    / show player's last action if it exists:
+    - case @action
+    - when 'hit'
+      Your action: Hit
+      %br
+      Your card: #{@card.to_s}
+    - when 'stand'
+      Your action: Stand
+    - when 'double'
+      Your action: Double
+      %br
+      Your card: #{@card.to_s}
+    - when 'split'
+      Your action: Split
+
+    %br
+    %br
+
+    / show player hand(s)
+    - @player.hands.each_with_index do |hand, idx|
+      - hand.reload
+      - next if hand.cards.empty?
+      .border-me
+        Player hand #{idx+1}:
+        %br
+        %div{ :class => "#{hand.current_game_hand? ? 'your-move' : ''} #{@blackjack.game_played? ? hand.win_lose_push(dealer_value) : ''}" }
+          - if hand.current_game_hand?
+            >>
+          #{hand.to_s}
+
+      / %br
+      / %p.border-me
+      /   \--debug
+      /   #{@hand.cards.map(&:to_s)}
+      /   debug--
+      / %br
+
+
+    - if @player.my_turn? && !@blackjack.game_played?
+      / Stand
+      = form_tag blackjack_stand_path(@blackjack.id, @player.id) do
+        = submit_tag 'Stand'
+      / Hit
+      = form_tag blackjack_hit_path(@blackjack.id, @player.id) do
+        = submit_tag 'Hit'
+      - if @player.current_hand.can_double?
+        / Double
+        = form_tag blackjack_double_path(@blackjack.id, @player.id) do
+          = submit_tag 'Double'
+      - if @player.current_hand.can_split?
+        / Split
+        = form_tag blackjack_split_path(@blackjack.id, @player.id) do
+          = submit_tag 'Split'
+
+    - if @blackjack.game_played?
+      = form_tag blackjack_redeal_path(@blackjack.id) do
+        = submit_tag 'Deal'
+
+- if Rails.env.development?
+  %br
+  %br
+  .border-me
+    Debug info:
+    %ul
+      %li
+        @player.my_turn?: #{@player.my_turn?}
+      %li
+        @blackjack.game_played?: #{@blackjack.game_played?}
+      %li
+        = form_tag blackjack_redeal_path(@blackjack.id, {:rig_split => true}) do
+          = submit_tag 'Find me a split-hand'
+      %li
+        = form_tag blackjack_redeal_path(@blackjack.id, {:rig_blackjack => true}) do
+          = submit_tag 'Find me a blackjack-hand'
