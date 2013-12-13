@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131210183704) do
+ActiveRecord::Schema.define(version: 20131210224248) do
 
   create_table "blackjacks", force: true do |t|
     t.datetime "created_at"
@@ -21,6 +21,14 @@ ActiveRecord::Schema.define(version: 20131210183704) do
   create_table "cards", force: true do |t|
     t.string   "value",      null: false
     t.string   "suit",       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "deploy_services", force: true do |t|
+    t.string   "name",                                 null: false
+    t.boolean  "enabled_for_beta",     default: false
+    t.boolean  "enabled_for_everyone", default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -81,6 +89,7 @@ ActiveRecord::Schema.define(version: 20131210183704) do
     t.boolean  "admin",                  default: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "beta",                   default: false
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
