@@ -34,8 +34,28 @@ class Player < ActiveRecord::Base
   end
 
   def split_hand
-    # hand = hands.delete() # TODO
-    # check_for_blackjack
+    to_split = current_hand_obj
+    hands.delete(current_hand_obj)
+    new_hands = []
+    to_split.cards.each do |c|
+      new_hand = Hand.create!
+      new_hand.player = self
+      new_hand.cards << game.draw
+      new_hand.save!
+      new_hands << new_hand
+    end
+    new_hands.each do |h|
+      h.cards << game.draw
+      h.save!
+    end
+    self.hands += new_hands
+    save!
+    game.check_for_blackjack
+    game.dealer_move if game.dealer_move?
+  end
+
+  def reset
+    update_attribute(:current_hand, 0)
   end
 
   # Pre-game methods

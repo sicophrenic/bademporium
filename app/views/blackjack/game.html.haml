@@ -55,9 +55,9 @@
       .border-me
         Player hand #{idx+1}:
         %br
-        - if @blackjack.current_player_id == @player.id && @player.current_hand_id == idx
-          >>
         %div{ :class => "#{@blackjack.current_player_id == @player.id && @player.current_hand_id == idx ? 'your-move' : ''} #{@blackjack.game_played? ? hand.win_lose_push(dealer_value) : ''}" }
+          - if @blackjack.current_player_id == @player.id && @player.current_hand == idx
+            >>
           #{hand.to_s}
 
       / %br
@@ -98,3 +98,9 @@
         @player.my_turn?: #{@player.my_turn?}
       %li
         @blackjack.game_played?: #{@blackjack.game_played?}
+      %li
+        = form_tag blackjack_redeal_path(@blackjack.id, {:rig_split => true}) do
+          = submit_tag 'Find me a split-hand'
+      %li
+        = form_tag blackjack_redeal_path(@blackjack.id, {:rig_blackjack => true}) do
+          = submit_tag 'Find me a blackjack-hand'

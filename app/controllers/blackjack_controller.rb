@@ -29,6 +29,7 @@ class BlackjackController < ApplicationController
       redirect_to blackjack_find_path
       return
     end
+    @hand = @player.current_hand_obj
     render 'game'
   end
 
@@ -46,9 +47,12 @@ class BlackjackController < ApplicationController
   end
 
   def redeal
+    opts = {}
+    opts[:rig_split] = 1 if params[:rig_split]
+    opts[:rig_blackjack] = 1 if params[:rig_blackjack]
     @blackjack.reset # TODO - don't need to reset unless deck is out of cards (or close to it)
-    @blackjack.prep_game(true) # prep game and save game hands
-    @player = @blackjack.current_player_obj
+    @blackjack.prep_game(true, opts) # prep game and save game hands
+    @player = @blackjack.current_player_obj || current_user.players.find_by(:game_id => @blackjack.id)
     @hand = @player.current_hand_obj
     render 'game'
   end

@@ -9,6 +9,9 @@ class Hand < ActiveRecord::Base
 
   validate :exclusive_hand
 
+  SPLIT_CARDS = [Card.find(7), Card.find(7)]
+  BLACKJACK_CARDS = [Card.find(9), Card.find(13)]
+
   # Method: calculate the value of a hand
   # Parameters:
   #   points_only

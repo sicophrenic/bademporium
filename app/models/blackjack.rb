@@ -20,7 +20,7 @@ class Blackjack < Game
     player_hands = []
     players.each do |p|
       p.hands.each do |h|
-        player_hands << h.bust?
+        player_hands << h.bust? || h.blackjack?
       end
     end
     !player_hands.all?
@@ -33,6 +33,7 @@ class Blackjack < Game
       dealer_move
     else
       check_for_blackjack
+      dealer_move if dealer_move?
     end
   end
 
@@ -41,8 +42,14 @@ class Blackjack < Game
   end
 
   def check_for_blackjack
-    if current_player_obj.current_hand_obj.blackjack?
-      next_player
+    if current_player_obj.current_hand_obj && current_player_obj.current_hand_obj.blackjack?
+      current_player_obj.current_hand_obj.mark_as_played
+      current_player_obj.end_turn? ? next_player : current_player_obj.next_hand
+      if dealer_move?
+        dealer_move
+      else
+        check_for_blackjack
+      end
     end
   end
 
@@ -72,23 +79,27 @@ class Blackjack < Game
   end
 
   # Pre-game methods
-  def prep_game(save_hands = false)
+  def prep_game(save_hands = false, options = {})
     if save_hands
       GameHand.create_from_game(self)
     end
     get_new_hands
-    deal_cards(false)
+    deal_cards(false, options)
     check_for_blackjack
+    dealer_move if dealer_move?
   end
 
   def reset
     set_up_cards
     shuffle
     update_attribute(:current_player, 0)
+    players.each do |p|
+      p.reset
+    end
     # get_new_hands
   end
 
-  def deal_cards(new_hands = true)
+  def deal_cards(new_hands = true, options = {})
     puts 'deal_cards' if Rails.env.development?
     if should_deal?
       get_new_hands if new_hands # TODO - not sure if we need this here
@@ -99,7 +110,18 @@ class Blackjack < Game
             player.get_new_hand
           end
           hand = player.hands.first
-          hand.cards << draw
+          if options[:rig_blackjack]
+            options[:rig_blackjack] -= 1
+            next if options[:rig_blackjack] == 0
+            hand.cards = Hand::BLACKJACK_CARDS
+          elsif options[:rig_split]
+            options[:rig_split] -= 1
+            next if options[:rig_split] == 0
+            hand.cards = Hand::SPLIT_CARDS
+          else
+            hand.cards << draw
+            hand.save!
+          end
           hand.save!
         end
         dealer_hand.cards << draw
