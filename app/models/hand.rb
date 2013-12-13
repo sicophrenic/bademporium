@@ -98,7 +98,7 @@ class Hand < ActiveRecord::Base
     end
   end
 
-  def to_dealer_s
+  def dealer_showing
     if cards.empty?
       to_s
     else
