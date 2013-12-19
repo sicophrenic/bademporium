@@ -101,6 +101,13 @@ class Hand < ActiveRecord::Base
     end
   end
 
+  def to_firebase_hash
+    return {
+      :hand_id => id,
+      :card_ids => cards.map(&:id)
+    }
+  end
+
   def dealer_showing
     if cards.empty?
       to_s

@@ -84,4 +84,15 @@ Bademporium::Application.routes.draw do
     # post 'blackjack_double/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_double', :as => 'blackjack_double'
     # post 'blackjack_split/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_split', :as => 'blackjack_split'
   end
+
+  scope :admin, :controller => 'admin' do
+    get '/', :action => 'index', :as => 'admin'
+    get 'deploy_services'
+  end
+
+  scope :deploy_service, :controller => 'deploy_services' do
+    post 'enable_for_everyone/:id', :action => 'enable_for_everyone', :as => 'enable_deploy_service_for_everyone'
+    post 'enable_for_beta/:id', :action => 'enable_for_beta', :as => 'enable_deploy_service_for_beta'
+    post 'disable/:id', :action => 'disable', :as => 'disable_deploy_service'
+  end
 end

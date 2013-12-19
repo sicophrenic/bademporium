@@ -45,6 +45,14 @@ class Player < ActiveRecord::Base
     update_attribute(:current_hand_idx, 0)
   end
 
+  def to_firebase_hash
+    player_hash = {
+      :player_id => id
+    }
+    player_hash[:hands] = hands.map(&:to_firebase_hash) if deal_in?
+    return player_hash
+  end
+
   # Pre-game methods
   def deal_me_in
     update_attribute(:deal_in, true)

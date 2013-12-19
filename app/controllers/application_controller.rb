@@ -11,6 +11,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_admin
+    if !user_signed_in? && !current_user.admin?
+      flash[:error] = 'Insufficient permissions.'
+      redirect_to root_path
+    end
+  end
+
   def can_join_game?(game)
     return game.players.count < game.num_players
   end

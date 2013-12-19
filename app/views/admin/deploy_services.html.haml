@@ -1,0 +1,32 @@
+%h1 Deploy Services
+
+%table.border-me
+  %thead
+    %tr
+      %th
+        Service Name
+      %th
+        Beta?
+      %th
+        Deployed?
+      %th
+      %th
+      %th
+  %tbody
+    - @deploy_services.each do |service|
+      %tr
+        %td
+          #{service.name}
+        %td
+          #{service.enabled_for_beta?}
+        %td
+          #{service.enabled_for_everyone?}
+        %td
+          = form_tag enable_deploy_service_for_beta_path(service.id) do
+            = submit_tag 'Enable for Beta'
+        %td
+          = form_tag enable_deploy_service_for_everyone_path(service.id) do
+            = submit_tag 'Enable for Everyone'
+        %td
+          = form_tag disable_deploy_service_path(service.id) do
+            = submit_tag 'Disable'

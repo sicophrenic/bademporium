@@ -24,6 +24,7 @@ gem 'protected_attributes'
 # Libraries
 gem 'devise'
 gem 'rufus-scheduler'
+gem 'firebase'
 
 group :production do
   gem 'thin'
