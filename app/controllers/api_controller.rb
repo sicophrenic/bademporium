@@ -1,5 +1,7 @@
 #-*- coding: utf-8 -*-#
 class ApiController < ApplicationController
+  include FirebaseHelper
+
   before_action :require_signed_in
 
   # Blackjack before_actions
@@ -8,6 +10,7 @@ class ApiController < ApplicationController
   before_action :set_blackjack_user, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
   before_action :set_player_hand, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
   before_action :verify_action, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
+  after_action :update_firebase, :only => [:blackjack_hit, :blackjack_stand, :blackjack_double, :blackjack_split]
 
   # Blackjack actions
   def blackjack_hit
@@ -90,5 +93,9 @@ class ApiController < ApplicationController
         flash[:error] = "Invalid params; #{@missing_params} were not present in the request."
         redirect_to blackjack_find_path
       end
+    end
+
+    def update_firebase
+      push_blackjack_to_firebase(@blackjack)
     end
 end

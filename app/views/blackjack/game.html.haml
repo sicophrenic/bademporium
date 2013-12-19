@@ -1,8 +1,8 @@
 %h1 Blackjack#game
 
-- if DeployService.find_by(:name => 'firebase_game').available_for_user?(current_user)
+- if DeployService.find_by(:name => 'firebase_game').enabled_for_user?(current_user)
   / Firebase game
-  = render 'firebase_game'
+  = render :partial => 'blackjack/firebase_game'
 - else
   / HTML game
-  = render 'html_game'
+  = render :partial => 'blackjack/html_game'

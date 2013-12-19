@@ -55,8 +55,15 @@ GEM
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     erubis (2.7.0)
+    ethon (0.6.1)
+      ffi (>= 1.3.0)
+      mime-types (~> 1.18)
     eventmachine (1.0.3)
     execjs (2.0.2)
+    ffi (1.9.3)
+    firebase (0.1.6)
+      json
+      typhoeus (>= 0.6.1)
     haml (4.0.4)
       tilt
     haml-rails (0.5.1)
@@ -151,6 +158,8 @@ GEM
       polyglot (>= 0.3.1)
     turbolinks (2.1.0)
       coffee-rails
+    typhoeus (0.6.6)
+      ethon (~> 0.6.1)
     tzinfo (0.3.38)
     uglifier (2.3.3)
       execjs (>= 0.3.0)
@@ -166,6 +175,7 @@ DEPENDENCIES
   coffee-rails (~> 4.0.0)
   debugger
   devise
+  firebase
   haml
   haml-rails
   jbuilder (~> 1.2)

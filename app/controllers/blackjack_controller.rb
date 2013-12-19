@@ -1,7 +1,10 @@
 #-*- coding: utf-8 -*-#
 class BlackjackController < ApplicationController
+  include FirebaseHelper
+
   before_action :require_signed_in
   before_action :set_blackjack, :only => [:join_game, :destroy_game, :ready_up, :game_start, :redeal]
+  after_action :update_firebase, :only => [:join_game, :ready_up, :game_start, :redeal]
 
   def find_game
     @games = Blackjack.all # .where(:privacy => 'public')
@@ -11,7 +14,15 @@ class BlackjackController < ApplicationController
   end
 
   def create_game
-    redirect_to blackjack_join_path(Blackjack.create!(params[:blackjack_options]).id)
+    blackjack = Blackjack.create!(params[:blackjack_options])
+    push_blackjack_to_firebase(blackjack)
+    redirect_to blackjack_join_path(blackjack.id)
+  end
+
+  def destroy_game
+    remove_blackjack_from_firebase(@blackjack)
+    @blackjack.destroy
+    redirect_to blackjack_find_path
   end
 
   def join_game
@@ -57,13 +68,12 @@ class BlackjackController < ApplicationController
     render 'game'
   end
 
-  def destroy_game
-    @blackjack.destroy
-    redirect_to blackjack_find_path
-  end
-
   private
     def set_blackjack
       @blackjack = Blackjack.find(params[:id])
+    end
+
+    def update_firebase
+      push_blackjack_to_firebase(@blackjack)
     end
 end

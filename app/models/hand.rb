@@ -113,6 +113,13 @@ class Hand < ActiveRecord::Base
     cards.empty?
   end
 
+  def to_firebase_hash
+    return {
+      :hand_id => id,
+      :card_ids => cards.map(&:id)
+    }
+  end
+
   private
     def exclusive_hand
       if player_id && dealer_id

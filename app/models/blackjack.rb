@@ -175,6 +175,14 @@ class Blackjack < Game
     end
   end
 
+  def to_firebase_hash
+    return {
+      :blackjack_id => id,
+      :dealer => dealer_hand.to_firebase_hash,
+      :players => players.map(&:to_firebase_hash)
+    }
+  end
+
   # ----- Private ----- #
 
   private

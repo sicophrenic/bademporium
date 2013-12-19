@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable,
          :confirmable
 
-  attr_accessible :email, :password, :password_confirmation, :admin
+  attr_accessible :email, :password, :password_confirmation, :admin, :beta
 
   has_many :players
 end
