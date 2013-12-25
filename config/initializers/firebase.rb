@@ -1,8 +1,7 @@
 #-*- coding: utf-8 -*-#
-if Rails.env.development?
-  firebase_url = 'https://bademporium-dev.firebaseio.com/'
-else
-  firebase_url = 'https://bademporium.firebaseio.com/'
-end
+FIREBASE_URL =
+  Rails.env.development? ?
+    'https://bademporium-dev.firebaseio.com/' :
+    'https://bademporium.firebaseio.com/'
 
-FIREBASE = Firebase.new(firebase_url)
+FIREBASE = Firebase.new(FIREBASE_URL)

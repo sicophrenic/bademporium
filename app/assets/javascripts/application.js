@@ -13,4 +13,10 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
-//= require_tree .
+
+/* BaDEmporium */
+//= require admin
+//= require api
+//= require blackjack
+//= require deploy_services
+//= require pages

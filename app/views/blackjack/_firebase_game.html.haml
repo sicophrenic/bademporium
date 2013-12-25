@@ -1,1 +1,13 @@
-= include_firebase
+= javascript_include_tag 'firebase'
+
+.firebase_game
+  .hand#dealer_hand
+  - @blackjack.players.each do |p|
+    %div{:id => "player_#{p.id}"}
+
+= javascript_include_tag 'https://cdn.firebase.com/v0/firebase.js'
+= firebase_update_dealer
+= firebase_update_players
+= firebase_update_hands
+= link_firebase
+= load_firebase

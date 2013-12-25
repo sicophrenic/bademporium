@@ -53,6 +53,15 @@ class Player < ActiveRecord::Base
     return player_hash
   end
 
+  def to_s
+    print_hands = hands.map(&:to_s)
+    print = []
+    print_hands.each_with_index do |h, i|
+      print << "<div id=\"player_#{id}_hand_#{i}\">#{h}</div>"
+    end
+    return print.join("\n");
+  end
+
   # Pre-game methods
   def deal_me_in
     update_attribute(:deal_in, true)

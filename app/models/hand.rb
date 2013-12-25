@@ -101,11 +101,18 @@ class Hand < ActiveRecord::Base
     end
   end
 
-  def to_firebase_hash
-    return {
-      :hand_id => id,
-      :card_ids => cards.map(&:id)
-    }
+  def to_firebase_hash(options = {})
+    if reveal = options.delete(:dealer)
+      return {
+        :hand_id => id,
+        :cards => reveal ? to_s : dealer_showing
+      }
+    else
+      return {
+        :hand_id => id,
+        :cards => to_s
+      }
+    end
   end
 
   def dealer_showing

@@ -232,7 +232,7 @@ class Blackjack < Game
   def to_firebase_hash
     return {
       :blackjack_id => id,
-      :dealer => dealer_hand.to_firebase_hash,
+      :dealer => dealer_hand ? dealer_hand.to_firebase_hash(:dealer => dealer_move?) : {},
       :players => players.map(&:to_firebase_hash)
     }
   end
