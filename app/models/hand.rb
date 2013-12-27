@@ -11,6 +11,7 @@ class Hand < ActiveRecord::Base
 
   SPLIT_CARDS = [Card.find(7), Card.find(20)]
   BLACKJACK_CARDS = [Card.find(9), Card.find(13)]
+  ACTIONS = [:hit, :stand, :double, :split]
 
   # Method: splits current hand and returns two new hands
   def split
@@ -66,7 +67,8 @@ class Hand < ActiveRecord::Base
     value == 21 && cards.count == 2
   end
 
-  def win_lose_push(target)
+  def win_lose_push(target = nil)
+    target = player.game.dealer_hand.value if target.nil?
     if value > 21
       # player bust
       'lose'
@@ -83,6 +85,13 @@ class Hand < ActiveRecord::Base
       # player beat dealer
       'win'
     end
+  end
+
+  def available_actions
+    available = ACTIONS.dup
+    available.delete(:double) unless can_double?
+    available.delete(:split) unless can_split?
+    return available
   end
 
   def can_double?
@@ -108,21 +117,30 @@ class Hand < ActiveRecord::Base
   def dealer_showing(imgs = false)
     if cards.empty?
       to_s
+    elsif imgs
+      "#{cards.last.to_img_s}"
     else
       "#{cards.last.to_s}"
     end
   end
 
   def to_firebase_hash(options = {})
-    if reveal = options.delete(:dealer)
-      return {
+    dealer_value = player.game.dealer_hand.value if player
+    reveal = options.delete(:dealer)
+    if reveal || reveal.nil?
+      # should reveal dealer or regular player hand
+      firebase_hash = {
         :hand_id => id,
-        :cards => reveal ? cards.map(&:to_img_s) : dealer_showing(true)
+        :cards => cards.map(&:to_img_s),
+        :value => value,
+        :actions => available_actions
       }
-    else
+      firebase_hash[:result] = win_lose_push(dealer_value) if player && player.game.game_played?
+      return firebase_hash
+    elsif !reveal
       return {
         :hand_id => id,
-        :cards => cards.map(&:to_img_s)
+        :cards => [dealer_showing(true)]
       }
     end
   end

@@ -109,9 +109,7 @@ class Blackjack < Game
       p.reset_current_hand # start with the right hand
     end
     get_new_hands(should_save_hands?) # deal new cards
-    puts "hsieh #{Time.now - start_time}"
     deal_cards(options)
-    puts "blaaaaaah #{Time.now - start_time} ben"
     update_attribute(:should_save_hands, true) # after the first deal, always save hands
     check_for_blackjack
     puts "reset_game took #{Time.now - start_time} seconds" if Rails.env.development?
@@ -226,7 +224,9 @@ class Blackjack < Game
     return {
       :blackjack_id => id,
       :dealer => dealer_hand ? dealer_hand.to_firebase_hash(:dealer => dealer_move?) : {},
-      :players => players.map(&:to_firebase_hash)
+      :current_player_idx => current_player_idx,
+      :players => players.map(&:to_firebase_hash),
+      :game_played => game_played?
     }
   end
 

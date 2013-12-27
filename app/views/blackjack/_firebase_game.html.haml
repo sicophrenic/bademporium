@@ -1,15 +1,36 @@
 = javascript_include_tag 'firebase'
 
-.firebase_game
-  .hand#dealer_hand
-    Dealer hand
-  - @blackjack.players.each do |p|
-    %div{:id => "player_#{p.id}"}
-      Player hand
+- if !@player.deal_in
+  = form_tag blackjack_ready_up_path(@blackjack.id, @player.id) do
+    = submit_tag 'Deal Me In'
+- else
+  - if @blackjack.dealer_hand.nil?
+    = form_tag blackjack_game_start_path(@blackjack.id) do
+      = submit_tag 'Start game'
+  - else
+    .firebase_game
+      .hand#dealer_hand
+        Dealer hand
+      - @blackjack.players.each do |p|
+        %div{ :id => "player_#{p.id}" }
+          Player hand
 
-= javascript_include_tag 'https://cdn.firebase.com/v0/firebase.js'
-= firebase_update_dealer
-= firebase_update_players
-= firebase_update_hands
-= link_firebase
-= load_firebase
+    = javascript_include_tag 'https://cdn.firebase.com/v0/firebase.js'
+    = firebase_update_winners
+    = firebase_update_dealer
+    = firebase_update_players
+    = firebase_update_hands
+    = link_firebase
+    = load_firebase
+
+    = form_tag blackjack_stand_path(@blackjack.id, @player.id), :remote => true do
+      = submit_tag 'Stand'
+    = form_tag blackjack_hit_path(@blackjack.id, @player.id), :remote => true do
+      = submit_tag 'Hit'
+    = form_tag blackjack_double_path(@blackjack.id, @player.id), :remote => true do
+      = submit_tag 'Double'
+    = form_tag blackjack_split_path(@blackjack.id, @player.id), :remote => true do
+      = submit_tag 'Split'
+
+    = form_tag blackjack_redeal_path(@blackjack.id), :remote => true do
+      = submit_tag 'Redeal'

@@ -9,7 +9,8 @@ class BlackjackController < ApplicationController
   before_action :set_player, :only => [:hit, :stand, :double, :split]
   before_action :verify_action, :only => [:hit, :stand, :double, :split]
 
-  after_action :update_firebase, :only => [:join_game, :ready_up, :game_start, :redeal]
+  after_action :update_firebase, :only => [:join_game, :ready_up, :game_start, :redeal,
+                                           :hit, :stand, :double, :split]
 
   # Game search
   def find_game
