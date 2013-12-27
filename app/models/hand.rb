@@ -97,7 +97,7 @@ class Hand < ActiveRecord::Base
     update_attribute(:played, true)
   end
 
-  def to_s
+  def to_s(imgs = false)
     if cards.empty?
       '[] == 0'
     else
@@ -105,25 +105,25 @@ class Hand < ActiveRecord::Base
     end
   end
 
-  def to_firebase_hash(options = {})
-    if reveal = options.delete(:dealer)
-      return {
-        :hand_id => id,
-        :cards => reveal ? to_s : dealer_showing
-      }
-    else
-      return {
-        :hand_id => id,
-        :cards => to_s
-      }
-    end
-  end
-
-  def dealer_showing
+  def dealer_showing(imgs = false)
     if cards.empty?
       to_s
     else
       "#{cards.last.to_s}"
+    end
+  end
+
+  def to_firebase_hash(options = {})
+    if reveal = options.delete(:dealer)
+      return {
+        :hand_id => id,
+        :cards => reveal ? cards.map(&:to_img_s) : dealer_showing(true)
+      }
+    else
+      return {
+        :hand_id => id,
+        :cards => cards.map(&:to_img_s)
+      }
     end
   end
 

@@ -2,8 +2,10 @@
 
 .firebase_game
   .hand#dealer_hand
+    Dealer hand
   - @blackjack.players.each do |p|
     %div{:id => "player_#{p.id}"}
+      Player hand
 
 = javascript_include_tag 'https://cdn.firebase.com/v0/firebase.js'
 = firebase_update_dealer
