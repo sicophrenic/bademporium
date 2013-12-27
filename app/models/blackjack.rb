@@ -1,10 +1,10 @@
 #-*- coding: utf-8 -*-#
 class Blackjack < Game
-  after_create :reset
 
   # Game methods
+  # Perform the dealer moves
   def dealer_move
-    if need_to_play?
+    if dealer_needs_to_play?
       value, hard = dealer_hand.value({:points_and_soft => true})
       while (value == 17 && dealer_hand.soft?) || value < 17
         # dealer_hand is less than 17 or is a soft 17
@@ -16,20 +16,11 @@ class Blackjack < Game
     dealer_hand.mark_as_played
   end
 
-  def need_to_play?
-    player_hands = []
-    players.each do |p|
-      p.hands.each do |h|
-        player_hands << h.bust? || h.blackjack?
-      end
-    end
-    !player_hands.all?
-  end
-
-  def next_player
-    self.current_player += 1
+  # Advance to the next player and perform the dealer moves if necessary
+  def to_next_player
+    self.current_player_idx += 1
     self.save!
-    if self.current_player == players.count
+    if self.current_player_idx == players.count
       dealer_move
     else
       check_for_blackjack
@@ -37,14 +28,16 @@ class Blackjack < Game
     end
   end
 
-  def dealer_move?
-    current_player == players.count
-  end
-
+  # Recursively check game for blackjacks for all players:
+  #   1) if current player's current hand is a blackjack, then mark it as played
+  #   and advance to the next player
+  #   2) then if it's the dealer's move, perform the dealer's move, otherwise check
+  #   the next player for blackjack
   def check_for_blackjack
-    if current_player_obj.current_hand_obj && current_player_obj.current_hand_obj.blackjack?
-      current_player_obj.current_hand_obj.mark_as_played
-      current_player_obj.end_turn? ? next_player : current_player_obj.next_hand
+    puts 'checking for blackjack' if Rails.env.development?
+    if current_player && current_player.current_hand && current_player.current_hand.blackjack?
+      current_player.current_hand.mark_as_played
+      current_player.end_turn? ? to_next_player : current_player.to_next_hand
       if dealer_move?
         dealer_move
       else
@@ -53,56 +46,81 @@ class Blackjack < Game
     end
   end
 
-  def game_played?
-    game_hands = dealer_hand ? [dealer_hand.played] : [nil]
-    players.each do |p|
-      p.hands.each do |h|
-        game_hands << h.played unless h.nil?
-      end
+  def hit(player)
+    @card = draw
+    @hand = player.current_hand
+    @hand.cards << @card
+    @hand.save
+
+    if @hand.bust? || @hand.value == 21
+      advance_player_or_hand(player)
     end
-    game_hands.all?
+    check_for_blackjack
   end
 
-  def draw(n = 1)
-    if n == 1
-      card = cards.pop
-      save!
-      return card
+  def stand(player)
+    @hand = player.current_hand
+    @hand.mark_as_played
+
+    advance_player_or_hand(player)
+    check_for_blackjack
+  end
+
+  def double(player)
+    @hand = player.current_hand
+    @card = draw
+    @hand.cards << @card
+    @hand.save
+    @hand.mark_as_played
+
+    advance_player_or_hand(player)
+    check_for_blackjack
+  end
+
+  def split(player)
+    @hand = player.current_hand
+    if @hand.can_split?
+      player.split_hand
+    end
+    check_for_blackjack
+  end
+
+  # Check if player's turn is over and advance to the next player if so, otherwise
+  # just advance to the player's next hand
+  def advance_player_or_hand(player)
+    if player.end_turn?
+      player.current_hand.mark_as_played
+      to_next_player
     else
-      popped = []
-      n.times do
-        popped << cards.pop
-      end
-      save!
-      return popped
+      player.to_next_hand
     end
   end
 
   # Pre-game methods
-  def prep_game(save_hands = false, options = {})
-    if save_hands
-      GameHand.create_from_game(self)
-    end
-    get_new_hands
-    deal_cards(false, options)
-    check_for_blackjack
-    dealer_move if dealer_move?
-  end
-
-  def reset
-    set_up_cards
-    shuffle
-    update_attribute(:current_player, 0)
+  # Pre- and post-game actions to prep a game for first time play or between plays
+  def reset_game(options = {})
+    # TODO-start - conditional reset, need to check # of remaining cards vs # of players
+    set_up_cards # create cards and deck(s)
+    # shuffle # shuffle cards -- already done by set_up_cards
+    # TODO-end
+    reset_current_player # start with the right player
     players.each do |p|
-      p.reset
+      p.reset_current_hand # start with the right hand
     end
-    # get_new_hands
+    get_new_hands(should_save_hands?) # deal new cards
+    deal_cards(options)
+    update_attribute(:should_save_hands, true) # after the first deal, always save hands
+    check_for_blackjack
   end
 
-  def deal_cards(new_hands = true, options = {})
+  def reset_current_player
+    update_attribute(:current_player_idx, 0)
+  end
+
+  # Start card-related methods -------------------------------------------------
+  def deal_cards(options = {})
     puts 'deal_cards' if Rails.env.development?
     if should_deal?
-      get_new_hands if new_hands # TODO - not sure if we need this here
       2.times do
         players.each do |player|
           next unless player.deal_in?
@@ -129,20 +147,52 @@ class Blackjack < Game
       end
     end
   end
-
-  def shuffle
-    11.times do
-      (0..self.cards.count-1).each do |idx|
-        current_card = self.cards[idx]
-        rnd_idx = rand(self.cards.count)
-        self.cards[idx] = self.cards[rnd_idx]
-        self.cards[rnd_idx] = current_card
-      end
-    end
-    self.save!
-  end
+  # End card-related methods ---------------------------------------------------
 
   # Helper methods
+  # Check if the dealer needs to play at all
+  def dealer_needs_to_play?
+    player_hands = []
+    players.each do |p|
+      p.hands.each do |h|
+        player_hands << h.bust? || h.blackjack?
+      end
+    end
+    !player_hands.all?
+  end
+
+  # Check if it's the dealer's move
+  def dealer_move?
+    current_player_idx == players.count
+  end
+
+  # Check if the current game is done
+  def game_played?
+    game_hands = dealer_hand ? [dealer_hand.played] : [nil]
+    players.each do |p|
+      p.hands.each do |h|
+        game_hands << h.played unless h.nil?
+      end
+    end
+    game_hands.all?
+  end
+
+  # Draw X number of cards from the deck
+  def draw(n = 1)
+    if n == 1
+      card = cards.pop
+      save!
+      return card
+    else
+      popped = []
+      n.times do
+        popped << cards.pop
+      end
+      save!
+      return popped
+    end
+  end
+
   def all_cards
     cards.map(&:to_s)
   end
@@ -163,29 +213,23 @@ class Blackjack < Game
     end
   end
 
-  def current_player_obj
-    players[current_player]
+  def current_player
+    if current_player_idx == players.count
+      return nil
+    else
+      return players[current_player_idx]
+    end
   end
 
   def current_player_id
-    if current_player == players.count
+    if current_player.nil?
       return -1
     else
-      return current_player_obj.id
+      return current_player.id
     end
   end
 
   # ----- Private ----- #
 
   private
-    def set_up_cards
-      self.cards = []
-      self.num_decks.times do
-        Card.all.each do |card|
-          self.cards << card
-        end
-      end
-      self.save!
-      shuffle
-    end
 end

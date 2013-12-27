@@ -2,7 +2,7 @@
 class Game < ActiveRecord::Base
   Card # need to eager load the Card model
 
-  attr_accessible :num_players, :current_player, :num_decks
+  attr_accessible :num_players, :current_player, :num_decks, :should_save_hands
 
   serialize :cards
 
@@ -18,7 +18,11 @@ class Game < ActiveRecord::Base
     end
   end
 
-  def get_new_hands
+  def get_new_hands(save_hands = false)
+    if save_hands
+      GameHand.create_from_game(self)
+    end
+
     puts 'get_new_hands' if Rails.env.development?
     new_dealer_hand
     players.each do |player|
@@ -36,5 +40,31 @@ class Game < ActiveRecord::Base
   def should_deal?
     # check to see if we have at least one player ready to play
     players.map(&:deal_in?).count(true) > 0
+  end
+
+  def shuffle
+    bad_cards = self.cards # try to get db logs as quiet as possible
+    11.times do
+      (0..bad_cards.count-1).each do |idx|
+        current_card = bad_cards[idx]
+        rnd_idx = rand(bad_cards.count)
+        bad_cards[idx] = bad_cards[rnd_idx]
+        bad_cards[rnd_idx] = current_card
+      end
+    end
+    self.cards = bad_cards
+    self.save!
+  end
+
+  def set_up_cards
+    bad_cards = []
+    self.num_decks.times do
+      Card.all.each do |card|
+        bad_cards << card
+      end
+    end
+    self.cards = bad_cards
+    self.save! # try to get db logs as quiet as possible
+    shuffle
   end
 end

@@ -58,20 +58,30 @@ Bademporium::Application.routes.draw do
   #     resources :products
   #   end
   namespace :blackjack do
-    get 'new', :action => 'new_game'
+    # CRUD-type actions
     post 'create', :action => 'create_game'
-    get 'join/:id', :action => 'join_game', :as => 'join'
-    get 'find', :action => 'find_game'
+    get 'new', :action => 'new_game'
     get 'destroy/:id', :action => 'destroy_game', :as => 'destroy'
+
+    get 'join/:id', :action => 'join_game', :as => 'join' # TODO - make this a post?
+    get 'find', :action => 'find_game'
+
+    # pre/post-game actions
     post 'deal_me_in/:id/player/:player_id', :action => 'ready_up', :as => 'ready_up'
     post 'game_start/:id', :action => 'game_start', :as => 'game_start'
     post 'redeal/:id', :action => 'redeal', :as => 'redeal'
+
+    # game actions
+    post ':id/hit/:player_id', :action => 'hit', :as => 'hit'
+    post ':id/stand/:player_id', :action => 'stand', :as => 'stand'
+    post ':id/split/:player_id', :action => 'split', :as => 'split'
+    post ':id/double/:player_id', :action => 'double', :as => 'double'
   end
 
   scope :api, :controller => 'api' do
-    post 'blackjack_hit/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_hit', :as => 'blackjack_hit'
-    post 'blackjack_stand/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_stand', :as => 'blackjack_stand'
-    post 'blackjack_double/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_double', :as => 'blackjack_double'
-    post 'blackjack_split/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_split', :as => 'blackjack_split'
+    # post 'blackjack_hit/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_hit', :as => 'blackjack_hit'
+    # post 'blackjack_stand/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_stand', :as => 'blackjack_stand'
+    # post 'blackjack_double/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_double', :as => 'blackjack_double'
+    # post 'blackjack_split/:blackjack_game_id/player/:player_id/hand/:hand_id', :action => 'blackjack_split', :as => 'blackjack_split'
   end
 end

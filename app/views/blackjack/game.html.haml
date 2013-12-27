@@ -1,36 +1,32 @@
 %h1 Blackjack#game
 
-- if @blackjack.players.map(&:deal_in).count(true) == 0
-  - # no valid players
-  - # not dealed in yet
+- if !@player.deal_in
+  / not dealed in yet
   = form_tag blackjack_ready_up_path(@blackjack.id, @player.id) do
     = submit_tag 'Deal Me In'
-- else
-  - # (some) players are ready to play
 
+- else
   - if @blackjack.dealer_hand.nil?
-    - # game not yet started
+    / (some) players are ready to play but game has not started yet
     = form_tag blackjack_game_start_path(@blackjack.id) do
       = submit_tag 'Start game'
   - else
-
     - dealer_value = @blackjack.dealer_hand.value
 
-    - # show dealer hand
-    - if @blackjack.dealer_hand && !@blackjack.dealer_hand.empty? # if there is a dealer hand
-      .border-me
-        Dealer hand:
-        %br
-        %div
-          - if @blackjack.dealer_move?
-            #{@blackjack.dealer_hand.to_s}
-          - else
-            #{@blackjack.dealer_hand.dealer_showing}
+    / show dealer hand appropriately
+    .border-me
+      Dealer hand:
+      %br
+      %div
+        - if @blackjack.dealer_move?
+          #{@blackjack.dealer_hand.to_s}
+        - else
+          #{@blackjack.dealer_hand.dealer_showing}
 
     %br
     %br
 
-    - # show player's last action if it exists:
+    / show player's last action if it exists:
     - case @action
     - when 'hit'
       Your action: Hit
@@ -48,15 +44,15 @@
     %br
     %br
 
-    - # show player hand(s)
+    / show player hand(s)
     - @player.hands.each_with_index do |hand, idx|
       - hand.reload
       - next if hand.cards.empty?
       .border-me
         Player hand #{idx+1}:
         %br
-        %div{ :class => "#{@blackjack.current_player_id == @player.id && @player.current_hand_id == idx ? 'your-move' : ''} #{@blackjack.game_played? ? hand.win_lose_push(dealer_value) : ''}" }
-          - if @blackjack.current_player_id == @player.id && @player.current_hand == idx
+        %div{ :class => "#{hand.current_game_hand? ? 'your-move' : ''} #{@blackjack.game_played? ? hand.win_lose_push(dealer_value) : ''}" }
+          - if hand.current_game_hand?
             >>
           #{hand.to_s}
 
@@ -70,18 +66,18 @@
 
     - if @player.my_turn? && !@blackjack.game_played?
       / Stand
-      = form_tag blackjack_stand_path(@blackjack.id, @player.id, @player.current_hand_id) do
+      = form_tag blackjack_stand_path(@blackjack.id, @player.id) do
         = submit_tag 'Stand'
       / Hit
-      = form_tag blackjack_hit_path(@blackjack.id, @player.id, @player.current_hand_id) do
+      = form_tag blackjack_hit_path(@blackjack.id, @player.id) do
         = submit_tag 'Hit'
-      - if @hand.can_double?
+      - if @player.current_hand.can_double?
         / Double
-        = form_tag blackjack_double_path(@blackjack.id, @player.id, @player.current_hand_id) do
+        = form_tag blackjack_double_path(@blackjack.id, @player.id) do
           = submit_tag 'Double'
-      - if @hand.can_split?
+      - if @player.current_hand.can_split?
         / Split
-        = form_tag blackjack_split_path(@blackjack.id, @player.id, @player.current_hand_id) do
+        = form_tag blackjack_split_path(@blackjack.id, @player.id) do
           = submit_tag 'Split'
 
     - if @blackjack.game_played?

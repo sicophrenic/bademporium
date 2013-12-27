@@ -113,6 +113,10 @@ class Hand < ActiveRecord::Base
     cards.empty?
   end
 
+  def current_game_hand?
+    self == player.current_hand && player == player.game.current_player
+  end
+
   private
     def exclusive_hand
       if player_id && dealer_id

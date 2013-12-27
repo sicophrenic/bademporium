@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-#
 class Player < ActiveRecord::Base
-  attr_accessible :user_id, :game_id, :current_hand
+  attr_accessible :user_id, :game_id, :current_hand_idx
 
   has_many :hands
 
@@ -9,33 +9,22 @@ class Player < ActiveRecord::Base
 
   # Game methods
   def end_turn?
-    current_hand == hands.count - 1
+    current_hand_idx == hands.count - 1
   end
 
   def my_turn?
     game.current_player_id == id
   end
 
-  def current_hand_id
-    if current_hand == hands.count
-      return -1
-    else
-      return current_hand_obj.id
-    end
-  end
-
-  def current_hand_obj
-    hands[current_hand]
-  end
-
-  def next_hand
-    self.current_hand += 1
+  def to_next_hand
+    current_hand.mark_as_played
+    self.current_hand_idx += 1
     self.save!
   end
 
   def split_hand
-    to_split = current_hand_obj
-    hands.delete(current_hand_obj)
+    to_split = current_hand
+    hands.delete(current_hand)
     new_hands = []
     to_split.cards.each do |c|
       new_hand = Hand.create!
@@ -50,12 +39,10 @@ class Player < ActiveRecord::Base
     end
     self.hands += new_hands
     save!
-    game.check_for_blackjack
-    game.dealer_move if game.dealer_move?
   end
 
-  def reset
-    update_attribute(:current_hand, 0)
+  def reset_current_hand
+    update_attribute(:current_hand_idx, 0)
   end
 
   # Pre-game methods
@@ -70,5 +57,22 @@ class Player < ActiveRecord::Base
   def get_new_hand
     self.hands = [Hand.create!(:player_id => id)]
     save!
+  end
+
+  # Helper methods
+  def current_hand
+    if current_hand_idx == hands.count
+      return nil
+    else
+      return hands[current_hand_idx]
+    end
+  end
+
+  def current_hand_id
+    if current_hand.nil?
+      return -1
+    else
+      return current_hand.id
+    end
   end
 end
