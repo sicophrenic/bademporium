@@ -56,7 +56,10 @@ class Game < ActiveRecord::Base
     self.save!
   end
 
+  # TODO - long term should have a set of processes that ONLY do shuffling of cards
+  # so that whenever new cards are needed, just take the first in the list
   def set_up_cards
+    puts 'set_up_cards' if Rails.env.development?
     bad_cards = []
     self.num_decks.times do
       Card.all.each do |card|

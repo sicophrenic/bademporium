@@ -23,21 +23,22 @@ class Player < ActiveRecord::Base
   end
 
   def split_hand
-    to_split = current_hand
+    current_hand.mark_as_played
+
+    first_card = current_hand.cards.first
+    second_card = current_hand.cards.last
+
     hands.delete(current_hand)
-    new_hands = []
-    to_split.cards.each do |c|
-      new_hand = Hand.create!
-      new_hand.player = self
-      new_hand.cards << game.draw
-      new_hand.save!
-      new_hands << new_hand
-    end
-    new_hands.each do |h|
-      h.cards << game.draw
-      h.save!
-    end
-    self.hands += new_hands
+
+    first_hand = hands.build
+    second_hand = hands.build
+
+    first_hand.cards << first_card
+    first_hand.cards << game.draw
+
+    second_hand.cards << second_card
+    second_hand.cards << game.draw
+
     save!
   end
 

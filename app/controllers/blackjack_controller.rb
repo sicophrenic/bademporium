@@ -82,11 +82,13 @@ class BlackjackController < ApplicationController
   end
 
   def redeal
-    opts = {}
-    opts[:rig_split] = 1 if params[:rig_split]
-    if params[:rig_blackjack]
-      opts[:rig_blackjack] = 1
-      opts.delete(:rig_split) # override rig_split if rig_blackjack
+    if @blackjack.num_players == 1
+      opts = {}
+      opts[:rig_split] = 1 if params[:rig_split]
+      if params[:rig_blackjack]
+        opts[:rig_blackjack] = 1
+        opts.delete(:rig_split) # override rig_split if rig_blackjack
+      end
     end
 
     @blackjack.reset_game(opts)

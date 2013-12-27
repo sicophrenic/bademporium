@@ -81,6 +81,11 @@
     - if @blackjack.game_played?
       = form_tag blackjack_redeal_path(@blackjack.id) do
         = submit_tag 'Deal'
+      - if (current_user.admin? && @blackjack.num_players == 1) || Rails.env.development?
+        = form_tag blackjack_redeal_path(@blackjack.id, {:rig_split => true}) do
+          = submit_tag 'Split-hand'
+        = form_tag blackjack_redeal_path(@blackjack.id, {:rig_blackjack => true}) do
+          = submit_tag 'Blackjack-hand'
 
 - if Rails.env.development?
   %br

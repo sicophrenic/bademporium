@@ -99,8 +99,9 @@ class Blackjack < Game
   # Pre-game methods
   # Pre- and post-game actions to prep a game for first time play or between plays
   def reset_game(options = {})
+    start_time = Time.now if Rails.env.development?
     # TODO-start - conditional reset, need to check # of remaining cards vs # of players
-    set_up_cards # create cards and deck(s)
+    set_up_cards if cards.count <= 6 * num_players # create cards and deck(s)
     # shuffle # shuffle cards -- already done by set_up_cards
     # TODO-end
     reset_current_player # start with the right player
@@ -108,9 +109,12 @@ class Blackjack < Game
       p.reset_current_hand # start with the right hand
     end
     get_new_hands(should_save_hands?) # deal new cards
+    puts "hsieh #{Time.now - start_time}"
     deal_cards(options)
+    puts "blaaaaaah #{Time.now - start_time} ben"
     update_attribute(:should_save_hands, true) # after the first deal, always save hands
     check_for_blackjack
+    puts "reset_game took #{Time.now - start_time} seconds" if Rails.env.development?
   end
 
   def reset_current_player
@@ -121,30 +125,19 @@ class Blackjack < Game
   def deal_cards(options = {})
     puts 'deal_cards' if Rails.env.development?
     if should_deal?
-      2.times do
-        players.each do |player|
-          next unless player.deal_in?
-          if player.hands.empty?
-            player.get_new_hand
-          end
-          hand = player.hands.first
-          if options[:rig_blackjack]
-            options[:rig_blackjack] -= 1
-            next if options[:rig_blackjack] == 0
-            hand.cards = Hand::BLACKJACK_CARDS
-          elsif options[:rig_split]
-            options[:rig_split] -= 1
-            next if options[:rig_split] == 0
-            hand.cards = Hand::SPLIT_CARDS
-          else
-            hand.cards << draw
-            hand.save!
-          end
-          hand.save!
-        end
-        dealer_hand.cards << draw
-        dealer_hand.save!
+      all_hands = players.map(&:current_hand) + [dealer_hand]
+      cards = draw((num_players + 1) * 2)
+      cards.each_with_index do |card, idx|
+        all_hands[(idx % (num_players+1))].cards << card
       end
+
+      if options[:rig_blackjack]
+        all_hands.first.cards = Hand::BLACKJACK_CARDS
+      elsif options[:rig_split]
+        all_hands.first.cards = Hand::SPLIT_CARDS
+      end
+
+      all_hands.map(&:save!)
     end
   end
   # End card-related methods ---------------------------------------------------
