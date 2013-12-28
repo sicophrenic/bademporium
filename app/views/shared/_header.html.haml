@@ -1,17 +1,20 @@
-= link_to root_path do
-  BaD Emporium
+%header.outer-header
+  .inner-header
+    %a.brand{ :href => root_path }
+      BaD EMPORIUM
 
-|
-
-- if user_signed_in?
-  = link_to destroy_user_session_path do
-    Sign Out
-  |
-  = link_to blackjack_new_path do
-    Create a Blackjack game
-  |
-  = link_to blackjack_find_path do
-    Find a Blackjack game
-- else
-  = link_to new_user_session_path do
-    Sign In
+    %ul.pull-right
+      - if user_signed_in?
+        %li
+          = link_to blackjack_new_path do
+            CREATE GAME
+        %li
+          = link_to blackjack_find_path do
+            FIND GAME
+        %li
+          = link_to destroy_user_session_path do
+            SIGN OUT
+      - else
+        %li
+          = link_to new_user_session_path do
+            SIGN IN
