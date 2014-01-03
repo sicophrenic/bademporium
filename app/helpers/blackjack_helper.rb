@@ -178,8 +178,9 @@ module BlackjackHelper
   end
 
   def link_firebase
+    env = 'staging_' if Rails.env.staging?
     javascript_tag "
-      var bademporium = new Firebase('#{FIREBASE_URL}blackjack_#{@blackjack.id}');
+      var bademporium = new Firebase('#{FIREBASE_URL}blackjack_#{env}#{@blackjack.id}');
     "
   end
 
