@@ -7,7 +7,7 @@ class CreateGames < ActiveRecord::Migration
       t.integer :current_player_idx, :default => 0
       t.integer :num_decks
       t.boolean :should_save_hands, :default => false
-      t.string :cards, :default => []
+      t.text :cards, :default => []
 
       t.timestamps
     end
