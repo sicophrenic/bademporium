@@ -10,4 +10,4 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-Bademporium::Application.config.secret_key_base = Rails.env.development? || Rails.env.staging? ? RAILS_SECRET_KEY : ENV['RAILS_SECRET_KEY']
+Bademporium::Application.config.secret_key_base = Rails.env.development? ? RAILS_SECRET_KEY : ENV['RAILS_SECRET_KEY']
