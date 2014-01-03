@@ -130,9 +130,9 @@ class Blackjack < Game
       end
 
       if options[:rig_blackjack]
-        all_hands.first.cards = Hand::BLACKJACK_CARDS
+        all_hands.first.cards = Hand.get_blackjack_hand
       elsif options[:rig_split]
-        all_hands.first.cards = Hand::SPLIT_CARDS
+        all_hands.first.cards = Hand.get_split_hand
       end
 
       all_hands.map(&:save!)

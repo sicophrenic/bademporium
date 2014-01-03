@@ -9,12 +9,14 @@ class Hand < ActiveRecord::Base
 
   validate :exclusive_hand
 
-  SPLIT_CARDS = [Card.find(7), Card.find(20)]
-  BLACKJACK_CARDS = [Card.find(9), Card.find(13)]
   ACTIONS = [:hit, :stand, :double, :split]
 
-  # Method: splits current hand and returns two new hands
-  def split
+  def self.get_split_hand
+    [Card.find(7), Card.find(20)]
+  end
+
+  def self.get_blackjack_hand
+    [Card.find(9), Card.find(13)]
   end
 
   # Method: calculate the value of a hand
