@@ -171,13 +171,13 @@ class Blackjack < Game
   # Draw X number of cards from the deck
   def draw(n = 1)
     if n == 1
-      card = cards.pop
+      card = Card.find(cards.pop.to_i)
       save!
       return card
     else
       popped = []
       n.times do
-        popped << cards.pop
+        popped << Card.find(cards.pop.to_i)
       end
       save!
       return popped

@@ -63,7 +63,7 @@ class Game < ActiveRecord::Base
     bad_cards = []
     self.num_decks.times do
       Card.all.each do |card|
-        bad_cards << card
+        bad_cards << card.id
       end
     end
     self.cards = bad_cards
