@@ -82,7 +82,7 @@ module BlackjackHelper
           dealer_hand_div.text(\"Dealer hand\");
           dealer_hand_div.append(\"<br/>\");
           dealer_hand.cards.forEach(function(c) {
-            dealer_hand_div.append(\"<img src=\" + c + \"/>\");
+            dealer_hand_div.append(\"<img alt=\" + c + \" src=\" + c + \"/>\");
           });
         }
       }
@@ -133,7 +133,7 @@ module BlackjackHelper
                     player_div.append(\"<div id=\" + hand_ref + \"></div>\");
                     hand_div = $(\"#\" + hand_ref);
                     h.cards.forEach(function(c) {
-                      hand_div.append(\"<img src=\" + c + \"/>\");
+                      hand_div.append(\"<img alt=\" + c + \" src=\" + c + \"/>\");
                     });
                     hand_count++;
 

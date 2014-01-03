@@ -49,7 +49,7 @@ ActiveRecord::Schema.define(version: 20131210224248) do
     t.integer  "current_player_idx", default: 0
     t.integer  "num_decks"
     t.boolean  "should_save_hands",  default: false
-    t.string   "cards",              default: "--- []\n"
+    t.text     "cards",              default: "--- []\n"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 20131210224248) do
   create_table "hands", force: true do |t|
     t.integer  "player_id"
     t.integer  "dealer_id"
-    t.string   "cards",      default: "--- []\n"
+    t.text     "cards",      default: "--- []\n"
     t.boolean  "played",     default: false
     t.datetime "created_at"
     t.datetime "updated_at"
