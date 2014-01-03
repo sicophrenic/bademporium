@@ -81,7 +81,7 @@ Bademporium::Application.configure do
   config.log_formatter = ::Logger::Formatter.new
 
   # Sendgrid
-  config.action_mailer.default_url_options = { :host => 'bademporium-staging.heroku.com'}
+  config.action_mailer.default_url_options = { :host => 'bademporium.heroku.com'}
 
   ActionMailer::Base.smtp_settings = {
     :address        => 'smtp.sendgrid.net',
