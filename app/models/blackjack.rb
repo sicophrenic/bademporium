@@ -220,11 +220,30 @@ class Blackjack < Game
     end
   end
 
+  def current_hand_idx_if
+    if current_player.nil?
+      return -1
+    else
+      return current_player.current_hand_idx
+    end
+  end
+
+  def current_hand_id_if
+    if current_player.nil?
+      return -1
+    else
+      return current_player.current_hand_id
+    end
+  end
+
   def to_firebase_hash
     return {
       :blackjack_id => id,
       :dealer => dealer_hand ? dealer_hand.to_firebase_hash(:dealer => dealer_move?) : {},
       :current_player_idx => current_player_idx,
+      :current_player_id => current_player_id,
+      :current_hand_idx => current_hand_idx_if,
+      :current_hand_id => current_hand_id_if,
       :players => players.map(&:to_firebase_hash),
       :game_played => game_played?
     }

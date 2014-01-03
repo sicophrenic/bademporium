@@ -24,13 +24,22 @@
     = load_firebase
 
     = form_tag blackjack_stand_path(@blackjack.id, @player.id), :remote => true do
-      = submit_tag 'Stand'
+      = submit_tag 'Stand', :class => 'stand-btn'
+    = show_or_hide_stand_button
+
     = form_tag blackjack_hit_path(@blackjack.id, @player.id), :remote => true do
-      = submit_tag 'Hit'
+      = submit_tag 'Hit', :class => 'hit-btn'
+    = show_or_hide_hit_button
+
     = form_tag blackjack_double_path(@blackjack.id, @player.id), :remote => true do
-      = submit_tag 'Double'
+      = submit_tag 'Double', :class => 'double-btn'
+    = show_or_hide_double_button
+
     = form_tag blackjack_split_path(@blackjack.id, @player.id), :remote => true do
-      = submit_tag 'Split'
+      = submit_tag 'Split', :class => 'split-btn'
+    = show_or_hide_split_button
+
 
     = form_tag blackjack_redeal_path(@blackjack.id), :remote => true do
-      = submit_tag 'Redeal'
+      = submit_tag 'Redeal', :class => 'redeal-btn'
+    = show_or_hide_redeal_button

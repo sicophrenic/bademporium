@@ -7,14 +7,68 @@ module BlackjackHelper
   end
 
   def show_or_hide_hit_button
+    javascript_tag "
+      var show_or_hide_hit_button = function(idx_of) {
+        if (idx_of >= 0) {
+          $('.hit-btn').show();
+        } else {
+          $('.redeal-btn').hide();
+        }
+      }
+      show_or_hide_hit_button(false);
+    "
   end
   def show_or_hide_stand_button
+    javascript_tag "
+      var show_or_hide_stand_button = function(idx_of) {
+        if (idx_of >= 0) {
+          $('.stand-btn').show();
+        } else {
+          $('.stand-btn').hide();
+        }
+      }
+      show_or_hide_stand_button(false);
+    "
   end
   def show_or_hide_double_button
+    javascript_tag "
+      var show_or_hide_double_button = function(idx_of) {
+        if (idx_of >= 0) {
+          $('.double-btn').show();
+        } else {
+          $('.double-btn').hide();
+        }
+      }
+      show_or_hide_double_button(false);
+    "
   end
   def show_or_hide_split_button
+    javascript_tag "
+      var show_or_hide_split_button = function(idx_of) {
+        if (idx_of >= 0) {
+          $('.split-btn').show();
+        } else {
+          $('.split-btn').hide();
+        }
+      }
+      show_or_hide_split_button(false);
+    "
   end
   def show_or_hide_redeal_button
+    javascript_tag "
+      var show_or_hide_redeal_button = function(game_over) {
+        if (game_over) {
+          $('.redeal-btn').show();
+          $('.hit-btn').hide();
+          $('.stand-btn').hide();
+          $('.split-btn').hide();
+          $('.double-btn').hide();
+        } else {
+          $('.redeal-btn').hide();
+        }
+      }
+      show_or_hide_redeal_button(false);
+    "
   end
 
   def show_or_hide_admin_buttons
@@ -22,7 +76,6 @@ module BlackjackHelper
 
   def firebase_update_dealer
     javascript_tag "
-      console.log('updating dealer');
       var update_dealer_hand = function(dealer_hand) {
         if (dealer_hand != undefined) {
           var dealer_hand_div = $(\"#dealer_hand\");
@@ -39,7 +92,6 @@ module BlackjackHelper
   def firebase_update_winners
     javascript_tag "
       var update_winners = function(players) {
-        console.log('updating winners');
         players.forEach(function(p) {
           if (p != undefined) {
             player_ref = \"player_\" + p.player_id;
@@ -65,8 +117,7 @@ module BlackjackHelper
   def firebase_update_players
     # TODO - add additional details to Firebase to prevent eager-loading here
     javascript_tag "
-      console.log('updating players');
-      var update_player_hands = function(players) {
+      var update_player_hands = function(players, curr_hand_id) {
         if (players != undefined) {
           players.forEach(function(p) {
             if (p != undefined) {
@@ -85,6 +136,13 @@ module BlackjackHelper
                       hand_div.append(\"<img src=\" + c + \"/>\");
                     });
                     hand_count++;
+
+                    if (h.hand_id == curr_hand_id) {
+                      show_or_hide_hit_button($.inArray('hit', h.actions));
+                      show_or_hide_stand_button($.inArray('stand', h.actions));
+                      show_or_hide_double_button($.inArray('double', h.actions));
+                      show_or_hide_split_button($.inArray('split', h.actions));
+                    }
                   }
                 });
               }
@@ -97,12 +155,10 @@ module BlackjackHelper
 
   def firebase_update_hands
     javascript_tag "
-      var update_hands = function(snapshot) {
-        console.log('updating hands');
-        game = snapshot.val();
+      var update_hands = function(game) {
         if (game.blackjack_id == #{@blackjack.id}) {
           update_dealer_hand(game.dealer);
-          update_player_hands(game.players);
+          update_player_hands(game.players, game.current_hand_id);
           if (game.game_played) {
             update_winners(game.players);
           }
@@ -114,8 +170,9 @@ module BlackjackHelper
   def load_firebase
     javascript_tag "
       bademporium.on('value', function(snapshot) {
-        console.log('value');
-        update_hands(snapshot);
+        game = snapshot.val();
+        update_hands(game);
+        show_or_hide_redeal_button(game.game_played);
       });
     "
   end
