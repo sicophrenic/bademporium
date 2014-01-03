@@ -5,6 +5,7 @@ class Hand < ActiveRecord::Base
   belongs_to :player
   belongs_to :game, :foreign_key => 'dealer_id'
 
+  # TODO - make cards just store card ids instead of the whole cards themselves
   serialize :cards
 
   validate :exclusive_hand
